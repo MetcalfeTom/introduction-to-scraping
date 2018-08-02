@@ -3,4 +3,4 @@ Quick tutorial example on scraping info from a Wiki, applicable to any webpage, 
 
 Requires: Scrapy, BeautifulSoup, Pandas (optional)
 
-Check the notebook for a step-by-step guide!
+Check the notebook for a step-by-step guide, or run the script with Python to view the results
