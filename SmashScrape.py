@@ -2,27 +2,31 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 from bs4 import BeautifulSoup
 
+
 class Character(scrapy.Item):
     name = scrapy.Field()
     specials = scrapy.Field()
     game = scrapy.Field()
     description = scrapy.Field()
 
+
 class URLSpider(scrapy.spiders.CrawlSpider):
     name = "smash"
     start_urls = ["https://www.ssbwiki.com/Super_Smash_Bros._for_Wii_U"]
 
     def parse(self, response):
-                                # all tables with @class   # 1st appearance  # all 'a' tags from that node
+        # all tables with @class,  1st appearance, all 'a' tags from that node
         veterans = response.xpath('//table[@class="wikitable"][1]//a')
 
-                                # continue from last selection  # all href variables
+        # all href variables from last selection
         veturls = veterans.xpath('.//@href').extract()
         veturls = [('https://www.ssbwiki.com' + v) for v in sorted(set(veturls)) if '(SSB4)' in v]
+
         for v in veturls:
             yield scrapy.Request(v, callback=self.parse_char)
 
-    def parse_char(self, response):
+    @staticmethod
+    def parse_char(response):
         soup = BeautifulSoup(response.text, 'html.parser')
         char = Character()
 
@@ -36,8 +40,8 @@ class URLSpider(scrapy.spiders.CrawlSpider):
             move = moves.findAll('tr')[num].findAll('td')[1]
             char['specials'].append(move.text)
 
-
         yield char
+
 
 process = CrawlerProcess({
     'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)',
